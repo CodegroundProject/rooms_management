@@ -12,8 +12,6 @@ var server = http.createServer(app);
 const Timer = require('./models/room-timer');
 
 
-
-
 var indexRouter = require('./routes/index');
 var {roomsRouter, addNewParticipation} = require('./routes/rooms');
 
@@ -86,12 +84,18 @@ io.on("connection", (socket) => {
 
 io.of("/").adapter.on("create-room", (room) => {
     console.log(`room ${room} was created`);
+    let timer = new Timer(updateTimerCallBack, room);
+    timer.startTimer();
 });
 
 io.of("/").adapter.on("join-room", (room, id) => {
     console.log(`socket ${id} has joined room ${room}`);
 });
 
+function updateTimerCallBack(roomid, time) {
+    console.log(`emitting timer to ${roomid}`);
+    io.to(roomid).emit('update timer', time);
+}
 
   
   
