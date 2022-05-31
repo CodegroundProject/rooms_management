@@ -2,20 +2,21 @@ var express = require('express');
 const uniqid = require('uniqid');
 const jwt = require('jsonwebtoken');
 
-var router = express.Router();
+var roomsRouter = express.Router();
 const Joi = require("joi")
 const Room = require("../models/rooms")
 const Participation = require("../models/participations")
 
 const { authorize, roles } = require("../middlewares/authorize") 
 
+
 /* GET rooms listing. */
-router.get('/', function (req, res, next) {
+roomsRouter.get('/', function (req, res, next) {
     res.send('respond with a resource');
 });
 
 // authorize([roles.User]),
-router.post("/create",  function (req, res) {
+roomsRouter.post("/create", async function (req, res) {
 
     const data = req.body
     const validator = Joi.object({
@@ -39,7 +40,7 @@ router.post("/create",  function (req, res) {
         challenge_id = get_random_challengeID()
         
         try {
-            let room = Room.create({
+            let room = await Room.create({
                 room_id: id,
                 creator_id: user_id,
                 challenge_id: challenge_id,
@@ -47,6 +48,9 @@ router.post("/create",  function (req, res) {
                 strategy: strategy,
                 timer: timer
             })
+
+            // let creator_socket = io.sockets.sockets.get(req.body.socket_id);
+            // creator_socket.join(id);
 
             try {
                 let participation = Participation.create({
@@ -68,12 +72,6 @@ router.post("/create",  function (req, res) {
                 })
             }
     
-
-            // res.json({
-            //     status: "success",
-            //     message: "Room created",
-            //     data: room
-            // })
         } catch (e) {
             console.error(e)
             res.status(500).json({
@@ -127,7 +125,7 @@ function get_random_challengeID(id_category) {
 }
 
 
-router.get("/:id", function (req, res) {
+roomsRouter.get("/:id", function (req, res) {
     
     const validId = req.params.id.toLowerCase();
     
@@ -137,7 +135,6 @@ router.get("/:id", function (req, res) {
             status: "error",
             message: `No room of id ${validId} was found`
         })
-
     }
 
     // room found
@@ -172,5 +169,33 @@ router.get("/:id", function (req, res) {
 })
 
 
+roomsRouter.post("/submit", function (req, res) {
 
-module.exports = router;
+
+
+
+})
+
+async function addNewParticipation(user_id, room_id)  {
+
+    let participation 
+    try {
+        participation = await Participation.create({
+            room_id: room_id,
+            user_id: user_id,
+            score: 0
+        })
+    
+    } catch (e) {
+        console.error(e)
+        
+    }
+
+    return participation;
+}
+
+
+module.exports = {
+    roomsRouter,
+    addNewParticipation
+};
