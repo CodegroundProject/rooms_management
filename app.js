@@ -13,7 +13,7 @@ const Timer = require('./models/room-timer');
 
 
 var indexRouter = require('./routes/index');
-var {roomsRouter, addNewParticipation} = require('./routes/rooms');
+var { roomsRouter, addNewParticipation } = require('./routes/rooms');
 
 var app = express();
 dotenv.config();
@@ -31,76 +31,26 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Note: Must be before routes since services use socket and it must be initialized
+const { initSocketIO } = require("./sockets/socket");
+initSocketIO(server)
+
 // app.use('/', indexRouter);
 app.use('/rooms', roomsRouter);
+
+
 
 //startHeartBeating()
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));
-  });
-
-const io = require("socket.io")(server, {
-    cors: {
-        origin: '*',
-    },
 });
 
 
-io.on("connection", (socket) => {
 
 
-    socket.on("join", async (data) => {
-        
-        socket.join(data.room_id);
-
-        //let participation = await addNewParticipation(data.user_id, data.room_id);
-        console.log("join");
-        console.log(data);
-
-        console.log('new user joined');
-
-        socket.to(data.room_id).emit("user joined", socket.id);
-
-    })
-
-    socket.on("leave", data => {
-
-        console.log("leave");
-        socket.to(data.room_id).emit("user left", socket.id);
-
-    })
-
-    socket.on("disconnect", () => {
-
-        console.log("disconnect");
-        // Get all room_id from participations where socket_id = socket.id
-        socket.broadcast.emit("user left", socket.id);
-
-    });
-
-})
-
-io.of("/").adapter.on("create-room", (room) => {
-    console.log(`room ${room} was created`);
-    let timer = new Timer(updateTimerCallBack, room);
-    timer.startTimer();
-});
-
-io.of("/").adapter.on("join-room", (room, id) => {
-    console.log(`socket ${id} has joined room ${room}`);
-});
-
-function updateTimerCallBack(roomid, time) {
-    console.log(`emitting timer to ${roomid}`);
-    io.to(roomid).emit('update timer', time);
-}
-
-  
-  
 module.exports = {
     server,
     app
 };
-  
