@@ -1,5 +1,6 @@
 // const { server } = require("../bin/server")
-const Timer = require('./models/room-timer');
+const Timer = require('../models/room-timer');
+
 let io;
 function initSocketIO(server) {
     io = require("socket.io")(server, {
