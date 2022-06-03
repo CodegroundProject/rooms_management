@@ -1,6 +1,5 @@
 var express = require('express');
 const uniqid = require('uniqid');
-const jwt = require('jsonwebtoken');
 const axios = require("axios")
 
 var roomsRouter = express.Router();
@@ -12,11 +11,11 @@ const { authorize, roles } = require("../middlewares/authorize")
 
 
 const lbInstance = require("./leaderboard");
-const { notifyRoomOnScoreChange } = require("../sockets/socket");
+const { get_io, notifyRoomOnScoreChange } = require("../sockets/socket");
 
 
 
-/* GET rooms listing. */
+/* GET. */
 roomsRouter.get('/', function (req, res, next) {
     res.send('respond with a resource');
 });
@@ -181,7 +180,7 @@ roomsRouter.post("/submit", async function (req, res) {
     const validator = Joi.object({
         challenge_id: Joi.string().required(),
         room_id: Joi.string().required(),
-        user_id: Joi.string().required(),
+        // user_id: Joi.string().optional(),
         code: Joi.string().required(),
         language: Joi.string().required(),
 
@@ -191,11 +190,11 @@ roomsRouter.post("/submit", async function (req, res) {
     if (!validationResult.error) {
 
         req.id = "s22"; //TEMP
-        user_id = req.id;
+        let user_id = req.id;
 
-        const { challenge_id, room_id, user_id, code, language } = data
+        const { challenge_id, room_id, code, lang } = data
 
-        axios.post(process.env.GRADING_API, {
+        axios.post(process.env.GRADING_ENDPOINT+'api/submit', {
             challenge_id: challenge_id,
             room_id: room_id,
             user_id: user_id,
@@ -203,7 +202,10 @@ roomsRouter.post("/submit", async function (req, res) {
             language: lang
         }).then(function (response) {
             // console.log(response.data);
-            const { score } = response.data.score;
+            const { score, calculatedAt } = response.data.data;
+            console.log(score);
+            console.log(calculatedAt);
+
             const lb = lbInstance(room_id)
             // Update score
 
@@ -213,8 +215,10 @@ roomsRouter.post("/submit", async function (req, res) {
             })
 
             // Send leaderboard event to room
-            const roomSize = io.sockets.adapter.rooms.get(room_id).size
-            notifyRoomOnScoreChange(room_id, lb.top(roomSize))
+            let io = get_io();
+            console.log(io.sockets.adapter.rooms.get(room_id).size);
+            const roomSize = io.sockets.adapter.rooms.get(room_id).size;
+            notifyRoomOnScoreChange(room_id, lb.top(roomSize));
 
             return res.json({
                 status: "ok",

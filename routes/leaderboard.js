@@ -7,7 +7,7 @@ const client = new Redis({
 });
 
 const instance = (lb_id) => {
-    return lb = new Leaderboard(client, room_id, {
+    return lb = new Leaderboard(client, lb_id, {
         sortPolicy: 'high-to-low',
         updatePolicy: 'replace'
     });

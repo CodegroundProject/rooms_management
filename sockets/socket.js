@@ -3,13 +3,12 @@ const Timer = require('../models/room-timer');
 
 let io;
 function initSocketIO(server) {
+    
     io = require("socket.io")(server, {
         cors: {
             origin: '*',
         },
     });
-
-
 
     // Note: Put any code that interacts with io directly here
 
@@ -49,23 +48,26 @@ function initSocketIO(server) {
 
     io.of("/").adapter.on("create-room", (room) => {
         console.log(`room ${room} was created`);
+        // console.log(io);
         let timer = new Timer(updateTimerCallBack, room);
         timer.startTimer();
+
     });
 
     io.of("/").adapter.on("join-room", (room, id) => {
         console.log(`socket ${id} has joined room ${room}`);
     });
 
+    console.log("init socket io");
+    // console.log(io);
 }
-
 
 
 
 // Note: These functions are called with io != undefined
 
 function updateTimerCallBack(roomid, time) {
-    console.log(`emitting timer to ${roomid}`);
+    // console.log(`emitting timer to ${roomid}`);
     io.to(roomid).emit('update timer', time);
 }
 
@@ -74,7 +76,12 @@ const notifyRoomOnScoreChange = (roomId, leaderboard) => {
     io.to(roomId).emit("leaderboard", leaderboard);
 }
 
+function get_io() {
+    return io;
+}
+
 module.exports = {
+    get_io,
     io,
     initSocketIO,
     notifyRoomOnScoreChange

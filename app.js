@@ -7,6 +7,8 @@ const mongoose = require("mongoose")
 const dotenv = require("dotenv")
 const { startHeartBeating } = require("./discovery/discovery")
 var http = require('http');
+var app = express();
+dotenv.config();
 var server = http.createServer(app);
 
 const Timer = require('./models/room-timer');
@@ -15,8 +17,7 @@ const Timer = require('./models/room-timer');
 var indexRouter = require('./routes/index');
 var { roomsRouter, addNewParticipation } = require('./routes/rooms');
 
-var app = express();
-dotenv.config();
+
 
 mongoose.connect("mongodb+srv://souaad:souaad@souaadcluster.0xben.mongodb.net/codeground--db?retryWrites=true&w=majority", {
     useNewUrlParser: true
@@ -44,7 +45,8 @@ app.use('/rooms', roomsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-    next(createError(404));
+    console.log('404')
+    // next(createError(404));
 });
 
 
