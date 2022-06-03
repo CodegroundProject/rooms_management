@@ -1,4 +1,4 @@
-const timerTickInterval = 200;
+const timerTickInterval = 1000;
 
 const { padDisplay } = require('../helpers');
 const TIMERSTATE = require('../helpers/timerStates');

@@ -64,6 +64,9 @@ socket.on('connect', function() {
     console.log('connected...', socket.id);
     socket.emit("join", data); // When I receive this in rooms management, I'll call "socket.join(data.room_id);" and add the user to the Participations collection
     // Now this user is included in the room identified by "room1" 
+
+
+    socket.emit("leave", data); //When a user clicks on "leave room"
 });
 
 // socket.on("joined", data => {

@@ -72,9 +72,9 @@ function updateTimerCallBack(roomid, time) {
 }
 
 
-const notifyRoomOnScoreChange = (roomId, leaderboard) => {
-    io.to(roomId).emit("leaderboard", leaderboard);
-}
+// const notifyRoomOnScoreChange = (roomId, leaderboard) => {
+//     io.to(roomId).emit("leaderboard", leaderboard);
+// }
 
 function get_io() {
     return io;
@@ -83,6 +83,5 @@ function get_io() {
 module.exports = {
     get_io,
     io,
-    initSocketIO,
-    notifyRoomOnScoreChange
+    initSocketIO
 }

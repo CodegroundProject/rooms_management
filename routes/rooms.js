@@ -10,7 +10,7 @@ const Participation = require("../models/participations")
 const { authorize, roles } = require("../middlewares/authorize")
 
 
-const lbInstance = require("./leaderboard");
+// const lbInstance = require("./leaderboard");
 const { get_io, notifyRoomOnScoreChange } = require("../sockets/socket");
 
 
@@ -215,10 +215,10 @@ roomsRouter.post("/submit", async function (req, res) {
             })
 
             // Send leaderboard event to room
-            let io = get_io();
-            console.log(io.sockets.adapter.rooms.get(room_id).size);
-            const roomSize = io.sockets.adapter.rooms.get(room_id).size;
-            notifyRoomOnScoreChange(room_id, lb.top(roomSize));
+            // let io = get_io();
+            // console.log(io.sockets.adapter.rooms.get(room_id).size);
+            // const roomSize = io.sockets.adapter.rooms.get(room_id).size;
+            // notifyRoomOnScoreChange(room_id, lb.top(roomSize));
 
             return res.json({
                 status: "ok",
