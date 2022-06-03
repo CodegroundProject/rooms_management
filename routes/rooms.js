@@ -28,7 +28,8 @@ roomsRouter.post("/create", async function (req, res) {
     const validator = Joi.object({
         challenge_type: Joi.string().required(),
         strategy: Joi.string().required(),
-        timer: Joi.number().required()
+        timer: Joi.number().required(),
+        socket_id: Joi.string().required()
     })
 
     const validationResult = validator.validate(data)
@@ -36,14 +37,13 @@ roomsRouter.post("/create", async function (req, res) {
         //Generate a unique link with uniqid
         const id = uniqid.time();
         //Get user id (this is the creator of the room)
-
         req.id = "s22"; //TEMP
         user_id = req.id;
 
         const { challenge_type, strategy, timer } = data
 
         //Bring id_challenge from content management
-        challenge_id = get_random_challengeID()
+        challenge_id = await get_random_challengeID(challenge_type)
 
         try {
             let room = await Room.create({
@@ -102,30 +102,28 @@ roomsRouter.post("/create", async function (req, res) {
 
 })
 
-function get_random_challengeID(id_category) {
+async function get_random_challengeID(id_category) {
 
     //Call content management
-    // Meanwhile 
-    return "b55";
 
     const content_request_body = {
-        "id_category": id_category,
+        "categorie": id_category,
     }
 
     const content_request_headers = {
         headers: { "Content-Type": "application/json" }
     };
 
-    axios.post(process.env.CONTENT_ENDPOINT, content_request_body, content_request_headers)
-        .then(resp => {
-            //         resp={
-            //             id_challenge : b9t6tres-hu56
-            //         }
-            return resp["id_challenge"]
+    return await axios.post(process.env.CONTENT_ENDPOINT+"api/challenges"  , content_request_body , content_request_headers )
+        .then((resp)=> { 
+            challenge = resp["data"]["challenge"]["challenge"]['_id']
+            console.log(challenge)
+            return challenge
         })
-        .catch(err => {
+        .catch(err=>{
             //sendResponse(res , 500 , false , err.message)
-            return "b4-gjfgh"
+            console.log(err)
+            return null
         })
 
 }
