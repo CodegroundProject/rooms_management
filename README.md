@@ -3,6 +3,7 @@
  
 ### Creating a new room 
 POST http://localhost:4001/rooms/create
+```javascript
 body 
 {
     "challenge_type": "data-structures",
@@ -10,7 +11,9 @@ body
     "timer": 60,
     "socket_id": "socket9787"
 }
+```
 returns in the best case scenario :
+```javascript
 {
   "status": "success",
   "message": "User joined",
@@ -25,9 +28,11 @@ returns in the best case scenario :
     "__v": 0
   }
 }
+```
 
 ### Submitting code in a room
 POST http://localhost:4001/rooms/submit
+```javascript
 body 
 {
     "challenge_id": "b55",
@@ -35,10 +40,13 @@ body
     "code": "def add(a,b): return (a+b)",
     "language": "python"
 }
+```
 returns in the best case scenario :
+```javascript
 {
   "status": "ok",
   "message": "room leaderboard changed"
 }
+```
 
 ### 
