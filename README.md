@@ -49,7 +49,7 @@ returns in the best case scenario :
 }
 ```
 
-##Example of a socket client
+## Example of a socket client
 ```javascript
 #!/usr/bin/env node
 const socket = require("socket.io-client")('http://localhost:4001/');
