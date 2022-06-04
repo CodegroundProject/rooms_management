@@ -2,6 +2,7 @@
 
 var createError = require('http-errors');
 var express = require('express');
+const cors = require("cors")
 var logger = require('morgan');
 const mongoose = require("mongoose")
 const dotenv = require("dotenv")
@@ -33,6 +34,7 @@ mongoose.connect("mongodb+srv://souaad:souaad@souaadcluster.0xben.mongodb.net/co
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors())
 
 // Note: Must be before routes since services use socket and it must be initialized
 const { initSocketIO } = require("./sockets/socket");
