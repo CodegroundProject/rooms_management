@@ -1,5 +1,7 @@
 // const { server } = require("../bin/server")
 const Timer = require('../models/room-timer');
+const { instrument } = require("@socket.io/admin-ui")
+
 
 let io;
 function initSocketIO(server) {
@@ -10,11 +12,16 @@ function initSocketIO(server) {
         },
     });
 
+    instrument(io, {
+        auth: false
+    })
+
     // Note: Put any code that interacts with io directly here
 
     io.on("connection", (socket) => {
 
-        console.log("hello")
+        console.log("hello");
+        
         socket.on("join", async (data) => {
 
             socket.join(data.room_id);
@@ -73,6 +80,8 @@ function updateTimerCallBack(roomid, time) {
 
 
 const notifyRoomOnScoreChange = (roomId, leaderboard) => {
+    console.log("leaderboard")
+    console.log(leaderboard)
     io.to(roomId).emit("leaderboard", leaderboard);
 }
 

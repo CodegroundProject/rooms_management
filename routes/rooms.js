@@ -36,7 +36,7 @@ roomsRouter.post("/create", async function (req, res) {
         //Generate a unique link with uniqid
         const id = uniqid.time();
         //Get user id (this is the creator of the room)
-        req.id = "s22"; //TEMP
+        req.id = "souaad"; //TEMP
         user_id = req.id;
 
         const { challenge_type, strategy, timer } = data
@@ -173,8 +173,8 @@ roomsRouter.get("/:id", function (req, res) {
 
 
 roomsRouter.post("/submit", async function (req, res) {
-    // Get data from request
 
+    // Get data from request
     const data = req.body
 
     const validator = Joi.object({
@@ -183,24 +183,27 @@ roomsRouter.post("/submit", async function (req, res) {
         // user_id: Joi.string().optional(),
         code: Joi.string().required(),
         language: Joi.string().required(),
-
+        strategy: Joi.string().required(),
+        secondsLeft: Joi.number().required()
     })
 
     const validationResult = validator.validate(data)
     if (!validationResult.error) {
 
-        req.id = "s22"; //TEMP
+        req.id = "userid1"; //TEMP
         let user_id = req.id;
 
-        const { challenge_id, room_id, code, lang } = data
+        const { challenge_id, room_id, code, language, strategy, secondsLeft } = data
 
         axios.post(process.env.GRADING_ENDPOINT+'api/submit', {
             challenge_id: challenge_id,
             room_id: room_id,
-            user_id: user_id,
             code: code,
-            language: lang
-        }).then(function (response) {
+            language: language,
+            strategy: strategy,
+            secondsLeft: secondsLeft
+
+        }).then(async function (response) {
             // console.log(response.data);
             const { score, calculatedAt } = response.data.data;
             console.log(score);
@@ -214,11 +217,15 @@ roomsRouter.post("/submit", async function (req, res) {
                 value: score
             })
 
+            console.log("lb")
+            console.log(lb)
+
             // Send leaderboard event to room
             let io = get_io();
             console.log(io.sockets.adapter.rooms.get(room_id).size);
             const roomSize = io.sockets.adapter.rooms.get(room_id).size;
-            notifyRoomOnScoreChange(room_id, lb.top(roomSize));
+            let topranks = await lb.top(roomSize);
+            notifyRoomOnScoreChange(room_id, topranks);
 
             return res.json({
                 status: "ok",
